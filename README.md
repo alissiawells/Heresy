@@ -1,6 +1,6 @@
 # Heresy
 
-Those who can’t get used to absence of generics will commit heresy unless Go2 is released.
+Those who can’t get used to the absence of generics will commit heresy unless Go2 is released.
 
 JSON sanitizer removes personally identifiable information from dataset:
 
