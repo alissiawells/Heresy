@@ -1,12 +1,12 @@
 package main
 
 import (
-	"os"
-	"fmt"
-	"io/ioutil"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"os"
 )
 
 type Response struct {
@@ -45,6 +45,14 @@ type Res struct {
 		Name string
 	}
 }
+func (x Res) encryptRes() Res {
+	x.First_name = Encrypt(x.First_name)
+	x.Last_name = Encrypt((x.Last_name))
+	x.Maide_name = Encrypt((x.Maide_name))
+	x.Relation_partner.Name = Encrypt((x.Relation_partner.Name))
+	x.Relatives[0].Name = Encrypt((x.Relatives[0].Name))
+	return x
+}
 
 type Rel struct {
 	Type string
@@ -58,9 +66,20 @@ func Encrypt(data string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
+
+func (res Response) encryptResponse() Response {
+	for i, x := range res.Response {
+		res.Response[i] = x.encryptRes()
+	}
+	return res
+}
+
 func main() {
 
 	input := os.Args[1]
+	//input := "input.json"
+    fmt.Println("Hello, little hacker!")
+
 	file, e := os.Open(input)
 	if e != nil {
 		fmt.Printf("File error: %v\n", e)
@@ -73,16 +92,11 @@ func main() {
 	var res *Response
 
 	json.Unmarshal([]byte(byteValue), &res)
+	res.encryptResponse()
+	b, _ := json.MarshalIndent(res, "", "    ")
 
-	res.Response[0].First_name = Encrypt(res.Response[0].First_name)
-	res.Response[0].Last_name = Encrypt((res.Response[0].Last_name))
-	res.Response[0].Maide_name = Encrypt((res.Response[0].Maide_name))
-	res.Response[0].Relation_partner.Name = Encrypt((res.Response[0].Relation_partner.Name))
-	res.Response[0].Relatives[0].Name = Encrypt((res.Response[0].Relatives[0].Name))
-
-	b, _ := json.Marshal(res)
-
-	output := os.Args[2]
+	//output := os.Args[2]
+	output := "output.json"
 	jsonFile, err := os.Create(output)
 
 	if err != nil {
